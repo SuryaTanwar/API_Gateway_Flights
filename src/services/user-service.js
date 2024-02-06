@@ -31,7 +31,7 @@ async function signin(data) {
         if(!passwordMatch) {
             throw new AppError("Invalid password", StatusCodes.BAD_REQUEST);
         }
-        const jwt = await Auth.createToken({id: user.id, email: user.email});
+        const jwt = Auth.createToken({id: user.id, email: user.email});
         return jwt;
 
     } catch (error) {

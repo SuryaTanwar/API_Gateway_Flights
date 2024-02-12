@@ -2,7 +2,7 @@ const express = require("express");
 const { ServerConfig } = require("./config");
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const rateLimit = require("express-rate-limit");
-const apiRoutes = require("./routes")
+const apiRoutes = require("./routes");
 
 const app = express();
 

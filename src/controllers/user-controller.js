@@ -43,6 +43,7 @@ async function signin(req, res) {
     }
 }
 
+
 async function addRoleToUser(req, res) {
     try {
         const user = await UserService.addRoletoUser({
@@ -61,6 +62,7 @@ async function addRoleToUser(req, res) {
                 .json(ErrorResponse);
     }
 }
+
 
 module.exports = {
     signup,

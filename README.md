@@ -1,48 +1,64 @@
-This is a base node js project template, which anyone can use as it has been prepared, by keeping some of the most important code principles and project management recommendations. Feel free to change anything. 
+# Flight Ticket Booking API Gateway
 
 
-`src` -> Inside the src folder all the actual source code regarding the project will reside, this will not include any kind of tests. (You might want to make separate tests folder)
+<h3>Introduction to the API Gateway Service</h3>
+<p>
+    Flight Ticket Booking API Gateway Service is a Node.js-based microservice that acts as a single entry point for various services in the flight ticket booking system. This service facilitates user registration, authentication, and routing requests to the appropriate microservices while implementing essential features such as JWT token authentication, rate limiting, and reverse proxy
+</p>
 
-Lets take a look inside the `src` folder
 
- - `config` -> In this folder anything and everything regarding any configurations or setup of a library or module will be done. For example: setting up `dotenv` so that we can use the environment variables anywhere in a cleaner fashion, this is done in the `server-config.js`. One more example can be to setup you logging library that can help you to prepare meaningful logs, so configuration for this library should also be done here. 
+<h3>High Level Design of Project</h3>
+<img src="High-Level-Design.png" alt="High level design of project"/>
 
- - `routes` -> In the routes folder, we register a route and the corresponding middleware and controllers to it. 
 
- - `middlewares` -> they are just going to intercept the incoming requests where we can write our validators, authenticators etc. 
+<h3>Features of the API Gateway Service</h3>
+<p>
+<ol>
+<li><p><b>User Registration and Sign Up:</b> Implemented APIs for user registration and sign-up using JWT tokens for secure authentication and bcrypt for storing passwords securely.</p></li>
+<li><p><b>Rate Limiter:</b>Integrated rate limiting functionality to limit the number of requests made to the API to prevent abuse and ensure fair usage.</p></li>
+<li><p><b>Reverse Proxy:</b>Configured a reverse proxy to enable access to multiple services through a single gateway, providing a streamlined experience for clients.</p></li>
+</ol>
+</p>
 
- - `controllers` -> they are kind of the last middlewares as post them you call your business layer to execute the business logic. In controllers we just receive the incoming requests and data and then pass it to the business layer, and once business layer returns an output, we structure the API response in controllers and send the output. 
+**Schema of this service**
 
- - `repositories` -> this folder contains all the logic using which we interact the DB by writing queries, all the raw queries or ORM queries will go here.
+![Schema_of_authentication_and_Authorization](./Schema_for_authentication_and_authorization.PNG)
 
- - `services` -> contains the buiness logic and interacts with repositories for data from the database
+**Sequence Diagram for Sign in functionality**
 
- - `utils` -> contains helper methods, error classes etc.
+![Sequence diagram](./Sequence_diagram_for_signin.PNG)
 
-### Setup the project
+**High level overview of this service**
 
- - Download this template from github and open it in your favourite text editor. 
- - Go inside the folder path and execute the following command:
-  ```
-  npm install
-  ```
- - In the root directory create a `.env` file and add the following env variables
-    ```
-        PORT=<port number of your choice>
-    ```
-    ex: 
-    ```
-        PORT=3000
-    ```
- - go inside the `src` folder and execute the following command:
-    ```
-      npx sequelize init
-    ```
- - By executing the above command you will get migrations, models and seeders folder along with a config.json inside the config folder. 
- - If you're setting up your development environment, then write the username of your db, password of your db and in dialect mention whatever db you are using for ex: mysql, mariadb etc
- - If you're setting up test or prod environment, make sure you also replace the host with the hosted db url.
+We use bcrypt js package in order to hash the password before saving to the User table. 
 
- - To run the server execute
- ```
- npm run dev    
- ```
+We leverage triggers (known as hooks in Sequelize), to compute the hash of the password before inserting the record into the table.
+
+The package 'npm-express-limit' helps us to ensure rate limiting. Rate limiting allows us to set a limit on the maximum number of requests than can be made from an IP in a specific window of time.
+
+In this project, we use the 'http-proxy-middleware' package in order to implement API routing a.k.a reverse proxy.
+
+In order to implement authorization mechanisms in our project, we implement a Roles table where we define the role of each user w.r.t our system (like IT Admin, Airplane Company, Customer). We identify a many to many relationship between the 'Users' and 'Roles' tables, and hence we need to setup a through table. This through table is a Users_Role table, and the User ID and Role Name is together used as a composite key.
+
+
+Some of the snapshots from this service are:
+
+1. Rate limiting in action
+
+![Rate limiting in action](./Rate_Limiting_in_action.PNG)
+
+2. Flights Booking Service being routed by the reverse proxy
+
+![Flights Booking Service Routing](./Flights_Booking_Service_API_Routing.PNG)
+
+3. Flights Search Service being routed by the reverse proxy
+
+![Flights Search Service Routing](./Flights_Search_Service_API_Routing.PNG)
+
+4. Assign (Add) role API working correctly when the user making the request is an admin:
+
+![Successful authorization](./Successful_authorization_hence_able_to_use_the_assign_API.PNG)
+
+5. Assign (Add) role API not working correctly when the user making the request is not an admin:
+
+![Unsuccessful authorization](./Authorization_fail_in_case_of_non_admin_role.PNG)
